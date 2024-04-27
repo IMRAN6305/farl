@@ -1,4 +1,9 @@
+import 'package:farl/pages/about_page.dart';
+import 'package:farl/pages/auth/login_page.dart';
+import 'package:farl/pages/profile_page.dart';
+import 'package:farl/pages/session_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -6,19 +11,50 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+
+  // List<Map<String, dynamic>> mDate = [
+  //   {
+  //     'title': "Finite Automata",
+  //     "Datetime": "29 Jan - 04 Feb 2024",
+  //     "status": "completed"
+  //   },
+  //   {
+  //     'title': "Regular Language",
+  //     "Datetime": "29 Jan - 04 Feb 2024",
+  //     "status": "completed"
+  //   },
+  //   {
+  //     'title': "Sd-3",
+  //     "Datetime": "29 Jan - 04 Feb 2024",
+  //     "status": "completed"
+  //   },
+  //   {
+  //     'title': "Sd-4",
+  //     "Datetime": "29 Jan - 04 Feb 2024",
+  //     "status": "in-progress"
+  //   },
+  //   {'title': "Sd-5", "Datetime": "29 Jan - 04 Feb 2024", "status": "locked"},
+  // ];
+
   List<Map<String, dynamic>> mDate = [
-    {'title': "Sd-1", "Datetime": "29 Jan - 04 Feb 2024", "status": "completed"},
-    {'title': "Sd-2", "Datetime": "29 Jan - 04 Feb 2024", "status": "completed"},
-    {'title': "Sd-3", "Datetime": "29 Jan - 04 Feb 2024", "status": "completed"},
-    {'title': "Sd-4", "Datetime": "29 Jan - 04 Feb 2024", "status": "in-progress"},
-    {'title': "Sd-5", "Datetime": "29 Jan - 04 Feb 2024", "status": "locked"},
+    {'id' : 1,'title': "Finite Automata", "Datetime": "29 Jan - 04 Feb 2024", "status": "completed"},
+    {"id":2,'title': "Regular Languag", "Datetime": "29 Jan - 04 Feb 2024", "status": "completed"}
   ];
+
+
+  Future<void> signOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Clear user data from shared preferences
+    await prefs.remove('userData');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.9),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.blue.withOpacity(0.8),
         title: Text(
           'Logo',
@@ -44,9 +80,15 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(),
+                    ));
+              },
               child: Text(
-                'Portfolio',
+                'Profile',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -57,22 +99,36 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: InkWell(
-              onTap: () {},
-              child: Text(
-                'Leaderboard',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AboutPage(),
+                    ));
+              },
               child: Text(
                 'About',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: InkWell(
+              onTap: () async {
+                await signOut();
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: Text(
+                'SignOut',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -147,12 +203,21 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: Text(
-                    "Let's Go",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Session(id:0),
+                          ));
+                    },
+                    child: Text(
+                      "Let's Go",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
                     ),
                   ),
                 ),
@@ -230,17 +295,37 @@ class _HomePageState extends State<HomePage> {
                                     // Navigate to sprint details page
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 12, horizontal: 24),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(24),
                                     ),
                                   ),
-                                  child: Text(
-                                    _getButtonText(mDate[index]['status']),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                  ),
+                                  child: mDate[index]['status'] == 'completed'
+                                      ? InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Session(id:index),
+                                                ));
+                                          },
+                                          child: Text(
+                                            _getButtonText(
+                                                mDate[index]['status']),
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          _getButtonText(
+                                              mDate[index]['status']),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                          ),
+                                        ),
                                 ),
                               ],
                             ),

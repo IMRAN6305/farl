@@ -1,9 +1,16 @@
+import 'package:farl/pages/auth/registration_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../api/auth_page.dart';
+import '../home_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
+
+
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
@@ -12,6 +19,59 @@ class _LoginPageState extends State<LoginPage> {
 
   String? _email;
   String? _password;
+  void initState() {
+    super.initState();
+    this.checkUserData();
+  }
+
+
+
+  Future<void> checkUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userDataJson = prefs.getString('userData');
+
+    print(userDataJson);
+
+    if (userDataJson != null) {
+      // User data exists, navigate to home page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    }
+  }
+
+
+  login(){
+// var mdata = {"email":_emailController.text,"password":_passwordController.text};
+
+
+getCurrentUser(email: _emailController.text,password: _passwordController.text).then((_) {
+
+  // Show success message in snackbar
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Login successful'),
+      duration: Duration(seconds: 2),
+      backgroundColor: Colors.blue,
+    ),
+  );
+  Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomePage(),
+      ));
+}).catchError((error) {
+  // Show error message in snackbar
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Registration failed: $error'),
+      duration: Duration(seconds: 2),
+    ),
+  );
+});
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: Container(
           height: 500.0,
-            width: 500.0,
+          width: 500.0,
           child: Center(
             child: Card(
               margin: EdgeInsets.all(20),
@@ -86,9 +146,10 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             // Perform login logic here
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Logging in...')),
-                            );
+                            this.login();
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(content: Text('Logging in...')),
+                            // );
                           }
                         },
                         child: Text('Login'),
@@ -97,6 +158,10 @@ class _LoginPageState extends State<LoginPage> {
                       TextButton(
                         onPressed: () {
                           // Navigate to registration page
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RegistrationPage()));
                         },
                         child: Text('Don\'t have an account? Register here'),
                       ),
