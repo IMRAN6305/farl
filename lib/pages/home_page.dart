@@ -5,44 +5,14 @@ import 'package:farl/pages/session_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data.dart';
+
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-
-
-  // List<Map<String, dynamic>> mDate = [
-  //   {
-  //     'title': "Finite Automata",
-  //     "Datetime": "29 Jan - 04 Feb 2024",
-  //     "status": "completed"
-  //   },
-  //   {
-  //     'title': "Regular Language",
-  //     "Datetime": "29 Jan - 04 Feb 2024",
-  //     "status": "completed"
-  //   },
-  //   {
-  //     'title': "Sd-3",
-  //     "Datetime": "29 Jan - 04 Feb 2024",
-  //     "status": "completed"
-  //   },
-  //   {
-  //     'title': "Sd-4",
-  //     "Datetime": "29 Jan - 04 Feb 2024",
-  //     "status": "in-progress"
-  //   },
-  //   {'title': "Sd-5", "Datetime": "29 Jan - 04 Feb 2024", "status": "locked"},
-  // ];
-
-  List<Map<String, dynamic>> mDate = [
-    {'id' : 1,'title': "Finite Automata", "Datetime": "29 Jan - 04 Feb 2024", "status": "completed"},
-    {"id":2,'title': "Regular Languag", "Datetime": "29 Jan - 04 Feb 2024", "status": "completed"}
-  ];
-
-
   Future<void> signOut() async {
     final prefs = await SharedPreferences.getInstance();
     // Clear user data from shared preferences
@@ -205,11 +175,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: InkWell(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Session(id:0),
-                          ));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => Session(name: ""),
+                      //     ));
                     },
                     child: Text(
                       "Let's Go",
@@ -251,49 +221,39 @@ class _HomePageState extends State<HomePage> {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: mDate.length,
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 1500,
+                    itemCount: mdata.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
                       childAspectRatio: 5 / 2,
                     ),
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () {
-                          // Navigate to sprint details page
-                        },
-                        child: Card(
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildStatusWidget(mDate[index]['status']),
-                                SizedBox(height: 8),
-                                Text(
-                                  '${mDate[index]['title']}',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                    itemBuilder: (context, index) {
+                      return Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: Column(
+                            children: [
+                              _buildStatusWidget(
+                                  mdata[mdata.keys.toList()[index]]!['status']
+                                      .toString()),
+                              Text(
+                                '${mdata.keys.toList()[index].toString()}',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  '${mDate[index]['Datetime']}',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    // Navigate to sprint details page
-                                  },
+                              ),
+                              SizedBox(height: 8),
+                              Text(mdata[mdata.keys.toList()[index]]!['date']
+                                  .toString()),
+                              SizedBox(height: 8),
+
+                              ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     padding: EdgeInsets.symmetric(
                                         vertical: 12, horizontal: 24),
@@ -301,39 +261,44 @@ class _HomePageState extends State<HomePage> {
                                       borderRadius: BorderRadius.circular(24),
                                     ),
                                   ),
-                                  child: mDate[index]['status'] == 'completed'
+                                  onPressed: () {
+                                    // Navigate to sprint details page
+                                  },
+                                  child: mdata[mdata.keys.toList()[index]]![
+                                  'status'].toString() == 'completed' || mdata[mdata.keys.toList()[index]]![
+                                  'status'].toString() == 'in-progress'
                                       ? InkWell(
                                           onTap: () {
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      Session(id:index),
+                                                      Session(name:mdata.keys.toList()[index].toString() ),
                                                 ));
                                           },
                                           child: Text(
-                                            _getButtonText(
-                                                mDate[index]['status']),
+                                            _getButtonText(mdata[mdata.keys
+                                                    .toList()[index]]!['status']
+                                                .toString()),
                                             style: TextStyle(
                                               fontSize: 16,
                                             ),
                                           ),
                                         )
                                       : Text(
-                                          _getButtonText(
-                                              mDate[index]['status']),
+                                          _getButtonText(mdata[mdata.keys
+                                                  .toList()[index]]!['status']
+                                              .toString()),
                                           style: TextStyle(
                                             fontSize: 16,
                                           ),
-                                        ),
-                                ),
-                              ],
-                            ),
+                                        ))
+                            ],
                           ),
                         ),
                       );
                     },
-                  ),
+                  )
                 ],
               ),
             ),
